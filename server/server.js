@@ -1,8 +1,8 @@
 const port = process.env.PORT || 3000;
 const { mongoose } = require('./db/mongoose');
 const _ = require('lodash')
-const { Todo } = require('./models/todo');
-const { User } = require('./models/user');
+var { Todo } = require('./models/todo');
+var { User } = require('./models/user');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb')
@@ -15,20 +15,6 @@ app.post('/todos', (req, res) => {
   })
 
   todo.save().then( doc => {
-    console.log("save thanh cong: ", doc)
-    res.send(doc)
-  }, err => {
-    res.status(400).send(err)
-    console.log("err: ")
-  })
-})
-
-app.post('/users', (req, res) => {
-  var user = new User({
-    email: req.body.email
-  })
-
-  user.save().then( doc => {
     console.log("save thanh cong: ", doc)
     res.send(doc)
   }, err => {
@@ -97,6 +83,32 @@ app.patch('/todos/:id', (req, res) => {
   })
 })
 
+// POST /users
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User(body);
+
+  user.save().then((user) => {
+    res.send(user);
+  }, (err) => {
+    res.status(400).send(err);
+  })
+})
+
+
+app.get('/users', (req, res) => {
+  User.find().then((users) => {
+    console.log("get:: ", users)
+    res.send({
+      users,
+      code: 200
+    })
+  }, err => {
+    res.status(400).send(err)
+  })
+})
 app.listen(port, () => {
   console.log(`start on port ${port}`)
 })
+
+module.exports = {app}
