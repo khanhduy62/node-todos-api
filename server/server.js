@@ -38,6 +38,7 @@ app.post('/users', (req, res) => {
 
 app.get('/todos', (req, res) => {
   Todo.find().then((todos) => {
+    console.log("get:: ", todos)
     res.send({
       todos,
       code: 200
@@ -57,5 +58,21 @@ app.get('/todos/:id', (req, res) => {
 
   Todo.findById(req.params.id).then((todo) => {
     res.send({todo})
+  })
+})
+
+app.delete('/todos/:id', (req, res) => {
+  if (!ObjectID.isValid(req.params.id)) {
+    return res.status(400).send()
+  }
+
+  Todo.findOneAndRemove({
+    _id: req.params.id
+  }).then((result) => {
+    console.log("remove thanh cong", result)
+    res.status(200).send();
+  }, (err) => {
+    console.log("co loi xay ra: ", err)
+    res.status(400).send();
   })
 })
