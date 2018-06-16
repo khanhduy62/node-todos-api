@@ -3,6 +3,7 @@ const { mongoose } = require('./db/mongoose');
 const _ = require('lodash');
 var { Todo } = require('./models/todo');
 var { User } = require('./models/user');
+var { authenticate } = require('./middleware/authenticate');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb')
@@ -99,7 +100,6 @@ app.post('/users', (req, res) => {
   })
 })
 
-
 app.get('/users', (req, res) => {
   User.find().then((users) => {
     console.log("get:: ", users)
@@ -110,6 +110,19 @@ app.get('/users', (req, res) => {
   }, err => {
     res.status(400).send(err)
   })
+})
+
+app.get('/users/me', authenticate, (req, res) => {
+  // var token = req.header('x-auth');
+  // User.findByToken(token).then((user) => {
+  //   if (!user) {
+      
+  //   }
+  //   res.send(user)
+  // }).catch((e) => {
+  //   res.status(401).send();
+  // })
+  res.send(req.user);
 })
 app.listen(port, () => {
   console.log(`start on port ${port}`)
